@@ -16,5 +16,6 @@ namespace Base.Infrastructure.Data
         }
 
         public DbSet<User> Users => Set<User>();
+
     }
 }

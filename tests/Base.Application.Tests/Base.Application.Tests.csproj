@@ -30,9 +30,4 @@
     <ProjectReference Include="..\..\src\Base.Application\Base.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mocks\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>
