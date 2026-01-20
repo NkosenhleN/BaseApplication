@@ -8,8 +8,8 @@ namespace Base.Application.Mappings
     public static class UserMappings
     {
         //Entity -> Response DTO
-        public static UserResponse ToResponseDto(this User user)
-            => new UserResponse
+        public static UserResponseDto ToResponseDto(this User user)
+            => new UserResponseDto
             {
                 Id = user.Id,
                 Username = user.UserName,
@@ -20,7 +20,9 @@ namespace Base.Application.Mappings
                 IsLocked = user.IsLocked,
                 CreatedAt = user.CreatedAt,
                 LastLoginAt = user.LastLoginAt,
-                PasswordChangedAt = user.PasswordChangedAt
+                PasswordChangedAt = user.PasswordChangedAt,
+                Roles = user.Roles.Select(r => r.Name).ToList()
+
             };
 
         // Command -> Entity (used internally in service)

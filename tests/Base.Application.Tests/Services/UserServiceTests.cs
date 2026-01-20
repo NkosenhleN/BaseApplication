@@ -16,14 +16,16 @@ namespace Base.Application.Tests.Services
     public class UserServiceTests
     {
         private readonly Mock<IUserRepository> _userRepoMock;
+        private readonly Mock<IRoleRepository> _roleRepoMock;
         private readonly Mock<IPasswordHasher> _hasherMock;
         private readonly UserService _userService;
 
         public UserServiceTests()
         {
             _userRepoMock = new Mock<IUserRepository>();
+            _roleRepoMock = new Mock<IRoleRepository>();
             _hasherMock = new Mock<IPasswordHasher>();
-            _userService = new UserService(_userRepoMock.Object, _hasherMock.Object);
+            _userService = new UserService(_userRepoMock.Object, _hasherMock.Object, _roleRepoMock.Object);
         }
 
         [Fact]
@@ -34,7 +36,7 @@ namespace Base.Application.Tests.Services
             _userRepoMock.Setup(r => r.UsernameExistsAsync(existingUsername))
                     .ReturnsAsync(true);
 
-            var service = new UserService(_userRepoMock.Object, _hasherMock.Object);
+            var service = new UserService(_userRepoMock.Object, _hasherMock.Object, _roleRepoMock.Object);
 
             var command = new CreateUserCommand(
                 existingUsername,

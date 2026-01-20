@@ -15,7 +15,8 @@ namespace Base.Infrastructure.Data
         {
         }
 
-        public DbSet<User> Users => Set<User>();
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Role> Roles { get; set; } = null!;
 
     }
 }

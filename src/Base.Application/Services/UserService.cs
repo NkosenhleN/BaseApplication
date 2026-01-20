@@ -2,23 +2,28 @@
 using Base.Application.Interfaces;
 using Base.Application.Mappings;
 using Base.Application.Responses;
+using Base.Domain.Common.Pagination;
 using Base.Domain.Entities;
 using Base.Domain.Interfaces;
+using Base.Domain.Queries;
 
 namespace Base.Application.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IRoleRepository _roleRepository;
 
-        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher)
+        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher,
+            IRoleRepository roleRepository)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
+            _roleRepository = roleRepository;
         }
 
-        public async Task<UserResponse> CreateUserAsync(CreateUserCommand command)
+        public async Task<UserResponseDto> CreateUserAsync(CreateUserCommand command)
         {
             if (await _userRepository.UsernameExistsAsync(command.UserName))
             {
@@ -35,15 +40,45 @@ namespace Base.Application.Services
             return user.ToResponseDto();
         }
 
-        public async Task<IEnumerable<UserResponse>> GetAllUsersAsync()
+        public async Task<UserResponseDto> UpdateUserAsync(Guid userId, UpdateUserCommand command)
         {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException("User not found");
 
-            var users = await _userRepository.GetAllAsync();
+            if (!string.IsNullOrWhiteSpace(command.FirstName))
+                user.FirstName = command.FirstName;
 
-            return users.Select(u => u.ToResponseDto()).ToList();
+            if (!string.IsNullOrWhiteSpace(command.LastName))
+                user.LastName = command.LastName;
+
+            if (!string.IsNullOrWhiteSpace(command.Email))
+                user.Email = command.Email;
+
+            if (command.IsActive.HasValue)
+                user.IsActive = command.IsActive.Value;
+
+            await _userRepository.SaveChangesAsync();
+
+            return user.ToResponseDto();
         }
 
-        public async Task<UserResponse?> GetByIdAsync(Guid id)
+
+        public async Task<PagedResult<UserResponseDto>> GetUsersAsync(GetUsersQuery query)
+        {
+            var result = await _userRepository.GetPagedAsync(query);
+
+            return new PagedResult<UserResponseDto>
+            {
+                Items = result.Items.Select(u => u.ToResponseDto()).ToList(),
+                TotalCount = result.TotalCount,
+                Page = result.Page,
+                PageSize = result.PageSize
+            };
+        }
+
+
+        public async Task<UserResponseDto?> GetByIdAsync(Guid id)
         {
             var user = await _userRepository.GetByIdAsync(id);
 
@@ -53,13 +88,14 @@ namespace Base.Application.Services
             return user.ToResponseDto();
         }
 
+
         public async Task<bool> UsernameExistsAsync(string username)
         {
             return await _userRepository.UsernameExistsAsync(username);
         }
 
 
-        public async Task<UserResponse> ChangePasswordAsync(ChangePasswordCommand command)
+        public async Task<UserResponseDto> ChangePasswordAsync(ChangePasswordCommand command)
         {
 
             var user = await _userRepository.GetByIdAsync(command.UserId);
@@ -78,6 +114,32 @@ namespace Base.Application.Services
 
             return user.ToResponseDto();
         }
+
+
+        public async Task AssignRoleAsync(Guid userId, string roleName)
+        {
+            var user = await _userRepository.GetByIdAsync(userId)
+                ?? throw new KeyNotFoundException("User not found");
+
+            var role = await _roleRepository.GetByNameAsync(roleName)
+            ?? throw new InvalidOperationException($"Role '{roleName}' does not exist");
+
+            user.AssignRole(role);
+
+            await _userRepository.UpdateAsync(user);
+            await _userRepository.SaveChangesAsync();
+        }
+
+        public async Task DeleteUserAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId)
+                ?? throw new KeyNotFoundException("User not found");
+
+            user.Delete();
+            await _userRepository.UpdateAsync(user);
+            await _userRepository.SaveChangesAsync();
+        }
+
 
     }
 }

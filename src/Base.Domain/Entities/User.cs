@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Base.Domain.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,23 +7,21 @@ using System.Threading.Tasks;
 
 namespace Base.Domain.Entities
 {
-    public class User
+    public class User : AuditableEntity
     {
         public Guid Id { get; private set; }
 
-        public string UserName { get; private set; } = null!;
-        public string Email { get; private set; } = null!;
-        public string FirstName { get; private set; } = null!;
-        public string LastName { get; private set; } = null!;
+        public string UserName { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string FirstName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
         public byte[] PasswordHash { get; private set; } = null!;
         public byte[] PasswordSalt { get; private set; } = null!;
-        public bool IsActive { get; private set; }
+        public bool IsActive { get; set; }
         public bool IsLocked { get; private set; }
         public int FailedLoginAttempts { get; private set; }
         public DateTime? LastLoginAt { get; private set; }
         public DateTime? PasswordChangedAt { get; private set; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime? UpdatedAt { get; private set; }
 
         private User() { } 
 
@@ -76,8 +75,26 @@ namespace Base.Domain.Entities
         public void Deactivate()
         {
             IsActive = false;
-            UpdatedAt = DateTime.UtcNow;
+            MarkUpdated();
         }
+
+        public ICollection<Role> Roles { get; private set; } = new List<Role>();
+
+        public void AssignRole(Role role)
+        {
+            if (Roles.Any(r => r.Name == role.Name))
+                return;
+
+            Roles.Add(role);
+        }
+
+        public void Delete()
+        {
+            if (IsDeleted) return;
+            MarkDeleted();
+        }
+
+
     }
 
 }

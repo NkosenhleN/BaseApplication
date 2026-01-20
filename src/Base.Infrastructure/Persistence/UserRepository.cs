@@ -1,9 +1,12 @@
-﻿using Base.Domain.Entities;
+﻿
+using Base.Domain.Queries;
+using Base.Domain.Common.Pagination;
+using Base.Domain.Entities;
 using Base.Domain.Interfaces;
 using Base.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Base.Infrastructure.Repositories
+namespace Base.Infrastructure.Persistence
 {
     public class UserRepository : IUserRepository
     {
@@ -18,6 +21,7 @@ namespace Base.Infrastructure.Repositories
         {
             return await _context.Users
                 .AsNoTracking()
+                .Include(u => u.Roles)
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 
@@ -50,5 +54,38 @@ namespace Base.Infrastructure.Repositories
             _context.Users.Update(user);
             await SaveChangesAsync();
         }
+
+        public async Task<PagedResult<User>> GetPagedAsync(GetUsersQuery query)
+        {
+            IQueryable<User> users = _context.Users.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                users = users.Where(u =>
+                    u.UserName.Contains(query.Search) ||
+                    u.Email.Contains(query.Search));
+            }
+
+            if (query.IsActive.HasValue)
+            {
+                users = users.Where(u => u.IsActive == query.IsActive.Value);
+            }
+
+            var totalCount = await users.CountAsync();
+
+            var items = await users
+                .Skip(query.Skip)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            return new PagedResult<User>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = query.Page,
+                PageSize = query.PageSize
+            };
+        }
+
     }
 }

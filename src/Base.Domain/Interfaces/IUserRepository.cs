@@ -1,9 +1,7 @@
-﻿using Base.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Base.Domain.Common.Pagination;
+using Base.Domain.Entities;
+using Base.Domain.Queries;
+
 
 namespace Base.Domain.Interfaces
 {
@@ -15,5 +13,7 @@ namespace Base.Domain.Interfaces
         Task UpdateAsync(User user);
         Task SaveChangesAsync();
         Task<bool> UsernameExistsAsync(string username);
+        Task<PagedResult<User>> GetPagedAsync(GetUsersQuery query);
+
     }
 }

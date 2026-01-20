@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Base.Application.Responses
 {
-    public class UserResponse
+    public class UserResponseDto
     {
         public Guid Id { get; set; }
         public string Username { get; set; } = null!;
@@ -18,5 +18,7 @@ namespace Base.Application.Responses
         public DateTime CreatedAt { get; set; }
         public DateTime? LastLoginAt { get; set; }
         public DateTime? PasswordChangedAt { get; set; }
+
+        public List<string> Roles { get; set; } = [];
     }
 }

@@ -4,7 +4,7 @@ using Base.Application.Services;
 using Base.Domain.Entities;
 using Base.Domain.Interfaces;
 using Base.Infrastructure.Data;
-using Base.Infrastructure.Repositories;
+using Base.Infrastructure.Persistence;
 using Base.Infrastructure.Security;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +33,9 @@ else
     );
 }
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserCreateValidator>();
 

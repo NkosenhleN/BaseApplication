@@ -1,7 +1,7 @@
 ﻿using Base.Application.Commands;
 using Base.Application.Services;
 using Base.Domain.Tests.Helpers;
-using Base.Infrastructure.Repositories;
+using Base.Infrastructure.Persistence;
 using Base.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -21,7 +21,8 @@ namespace Base.Domain.Tests.Services
             using var context = TestDbContextFactory.Create();
             var repo = new UserRepository(context);
             var hasher = new PasswordHasher();
-            var service = new UserService(repo, hasher);
+            var role = new RoleRepository(context);
+            var service = new UserService(repo, hasher, role);
 
             var user = await context.Users.FirstAsync(u => u.UserName == "admin");
             var command = new ChangePasswordCommand(user.Id, "Admin123!", "NewPass456!");
