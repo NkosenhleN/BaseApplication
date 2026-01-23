@@ -6,7 +6,7 @@ using Base.Domain.Interfaces;
 using Base.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Base.Infrastructure.Persistence
+namespace Base.Infrastructure.Repositories
 {
     public class UserRepository : IUserRepository
     {
@@ -37,7 +37,6 @@ namespace Base.Infrastructure.Persistence
             return await _context.Users
                 .AnyAsync(u => u.UserName == username);
         }
-
 
         public async Task AddAsync(User user)
         {

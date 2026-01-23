@@ -94,7 +94,7 @@ namespace Base.API.Controllers
             return Ok(user); 
         }
 
-        [HttpPut("{id:guid}/roles")]
+        [HttpPut("{id:guid}/assign-role")]
         public async Task<IActionResult> AssignRole(Guid id, AssignRoleDto dto)
         {
             try
@@ -125,6 +125,7 @@ namespace Base.API.Controllers
                 return NotFound();
             }
         }
+
 
     }
 }

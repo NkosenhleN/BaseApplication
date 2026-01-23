@@ -1,7 +1,7 @@
 ﻿using Base.Application.Commands;
 using Base.Application.Services;
 using Base.Domain.Tests.Helpers;
-using Base.Infrastructure.Persistence;
+using Base.Infrastructure.Repositories;
 using Base.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using System;

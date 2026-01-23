@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Base.Infrastructure.Persistence
+namespace Base.Infrastructure.Repositories
 {
     public class RoleRepository : IRoleRepository
     {

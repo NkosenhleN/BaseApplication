@@ -11,6 +11,8 @@ namespace Base.Domain.Entities
     {
         public Guid Id { get; private set; }
         public string Name { get; private set; } = default!;
+        public ICollection<User> Users { get; private set; } = new List<User>();
+
 
         private Role() { }
 
@@ -21,7 +23,20 @@ namespace Base.Domain.Entities
             CreatedAt = DateTime.UtcNow;
         }
 
+        public void Rename(string newName)
+        {
+            if (string.IsNullOrWhiteSpace(newName))
+                throw new ArgumentException("Role name cannot be empty");
 
+            Name = newName.Trim();
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void Delete()
+        {
+            if (IsDeleted) return;
+            MarkDeleted();
+        }
 
     }
 
