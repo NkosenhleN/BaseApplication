@@ -5,12 +5,14 @@ using Base.Application.Interfaces;
 using Base.Application.Responses;
 using Base.Application.Services;
 using Base.Domain.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Base.API.Controllers
 {
     [ApiController]
     [Route("api/users")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -20,7 +22,7 @@ namespace Base.API.Controllers
             _userService = userService;
         }
 
-        [HttpPost]
+        [HttpPost("user")]
         public async Task<IActionResult> CreateUser(CreateUserDto dto)
         {
             try
@@ -95,6 +97,8 @@ namespace Base.API.Controllers
         }
 
         [HttpPut("{id:guid}/assign-role")]
+        [HttpPost("assign-role")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssignRole(Guid id, AssignRoleDto dto)
         {
             try
@@ -123,6 +127,22 @@ namespace Base.API.Controllers
             catch (KeyNotFoundException)
             {
                 return NotFound();
+            }
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDto dto)
+        {
+            var command = dto.ToCommand();
+
+            try
+            {
+                var token = await _userService.LoginAsync(command);
+                return Ok(new {Token = token});
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 

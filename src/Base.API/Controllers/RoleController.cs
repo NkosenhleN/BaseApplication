@@ -2,12 +2,14 @@
 using Base.API.Mappers;
 using Base.Application.Interfaces;
 using Base.Application.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Base.API.Controllers
 {
     [ApiController]
     [Route("api/roles")]
+    [Authorize]
     public class RoleController : ControllerBase
     {
         private readonly IRoleService _roleService;
@@ -18,6 +20,7 @@ namespace Base.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<RoleResponseDto>> CreateRole(CreateRoleDto dto)
         {
             try
@@ -34,6 +37,7 @@ namespace Base.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<RoleResponseDto>>> GetAllRoles()
         {
             var roles = await _roleService.GetAllRolesAsync();

@@ -18,6 +18,7 @@ namespace Base.Application.Tests.Services
         private readonly Mock<IUserRepository> _userRepoMock;
         private readonly Mock<IRoleRepository> _roleRepoMock;
         private readonly Mock<IPasswordHasher> _hasherMock;
+        private readonly Mock<IJwtService> _jwtMock;
         private readonly UserService _userService;
 
         public UserServiceTests()
@@ -25,7 +26,9 @@ namespace Base.Application.Tests.Services
             _userRepoMock = new Mock<IUserRepository>();
             _roleRepoMock = new Mock<IRoleRepository>();
             _hasherMock = new Mock<IPasswordHasher>();
-            _userService = new UserService(_userRepoMock.Object, _hasherMock.Object, _roleRepoMock.Object);
+            _jwtMock = new Mock<IJwtService>();
+            _userService = new UserService(_userRepoMock.Object, _hasherMock.Object, 
+                _roleRepoMock.Object, _jwtMock.Object);
         }
 
         [Fact]
@@ -36,7 +39,8 @@ namespace Base.Application.Tests.Services
             _userRepoMock.Setup(r => r.UsernameExistsAsync(existingUsername))
                     .ReturnsAsync(true);
 
-            var service = new UserService(_userRepoMock.Object, _hasherMock.Object, _roleRepoMock.Object);
+            var service = new UserService(_userRepoMock.Object, _hasherMock.Object,
+                _roleRepoMock.Object, _jwtMock.Object);
 
             var command = new CreateUserCommand(
                 existingUsername,

@@ -19,5 +19,7 @@ namespace Base.Application.Interfaces
         Task DeleteUserAsync(Guid userId);
         Task<UserResponseDto> ChangePasswordAsync(ChangePasswordCommand command);
         Task AssignRoleAsync(Guid userId, string roleName);
+        Task<string> LoginAsync(LoginCommand command);
+
     }
 }

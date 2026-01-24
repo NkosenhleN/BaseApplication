@@ -3,11 +3,12 @@ using Base.Application.Commands;
 
 namespace Base.API.Mappers
 {
-    public static class CreateRoleDtoMapper
+    public static class LoginDtoMapper
     {
-        public static CreateRoleCommand ToCommand(this CreateRoleDto dto)
-            => new CreateRoleCommand(
-                dto.Name
+        public static LoginCommand ToCommand(this LoginDto dto)
+            => new LoginCommand(
+                dto.UserName,
+                dto.Password
             );
     }
 }

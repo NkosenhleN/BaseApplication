@@ -14,13 +14,15 @@ namespace Base.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IRoleRepository _roleRepository;
+        private readonly IJwtService _jwtService;
 
         public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher,
-            IRoleRepository roleRepository)
+            IRoleRepository roleRepository, IJwtService jwtService)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _roleRepository = roleRepository;
+            _jwtService = jwtService;
         }
 
         public async Task<UserResponseDto> CreateUserAsync(CreateUserCommand command)
@@ -138,6 +140,29 @@ namespace Base.Application.Services
             user.Delete();
             await _userRepository.UpdateAsync(user);
             await _userRepository.SaveChangesAsync();
+        }
+
+
+        public async Task<string> LoginAsync(LoginCommand command)
+        { 
+            var user = await _userRepository.GetByUserNameAsync(command.UserName);
+            if (user == null)
+                throw new InvalidOperationException("Invalid username or password");
+
+            if (user.IsLocked)
+                throw new InvalidOperationException("Account is locked due to multiple failed login attempts");
+
+            if (!_passwordHasher.VerifyPassword(command.Password, user.PasswordHash, user.PasswordSalt))
+            {
+                user.RecordLoginFailure();
+                await _userRepository.SaveChangesAsync();
+                throw new InvalidOperationException("Invalid username or password");
+            }
+
+            user.RecordLoginSuccess();
+            await _userRepository.SaveChangesAsync();
+
+            return _jwtService.GenerateToken(user);
         }
 
 

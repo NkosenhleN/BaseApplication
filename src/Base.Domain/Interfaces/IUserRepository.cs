@@ -8,6 +8,7 @@ namespace Base.Domain.Interfaces
     public interface IUserRepository
     {
         Task<User?> GetByIdAsync(Guid id);
+        Task<User?> GetByUserNameAsync(string userName);
         Task<IEnumerable<User>> GetAllAsync();
         Task AddAsync(User user);
         Task UpdateAsync(User user);
