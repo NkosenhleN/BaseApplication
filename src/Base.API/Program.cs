@@ -37,14 +37,7 @@ if (builder.Environment.IsDevelopment())
         )
     );
 }
-else
-{
-    builder.Services.AddDbContext<BaseDbContext>(options =>
-        options.UseSqlServer(
-            builder.Configuration.GetConnectionString("DefaultConnection")
-        )
-    );
-}
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();

@@ -29,7 +29,7 @@ namespace Base.Domain.Entities
                 throw new ArgumentException("Role name cannot be empty");
 
             Name = newName.Trim();
-            UpdatedAt = DateTime.UtcNow;
+            MarkUpdated();
         }
 
         public void Delete()

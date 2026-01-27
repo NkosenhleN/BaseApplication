@@ -12,7 +12,6 @@ namespace Base.API.Controllers
 {
     [ApiController]
     [Route("api/users")]
-    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -96,26 +95,6 @@ namespace Base.API.Controllers
             return Ok(user); 
         }
 
-        [HttpPut("{id:guid}/assign-role")]
-        [HttpPost("assign-role")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AssignRole(Guid id, AssignRoleDto dto)
-        {
-            try
-            {
-                await _userService.AssignRoleAsync(id, dto.RoleName);
-                return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -146,6 +125,13 @@ namespace Base.API.Controllers
             }
         }
 
+        [HttpPost("{id}/unlock")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UnlockUser(Guid id)
+        {
+            await _userService.UnlockUserAsync(id);
+            return NoContent();
+        }
 
     }
 }

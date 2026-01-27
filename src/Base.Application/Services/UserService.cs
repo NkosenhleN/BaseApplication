@@ -58,9 +58,11 @@ namespace Base.Application.Services
                 user.Email = command.Email;
 
             if (command.IsActive.HasValue)
-                user.IsActive = command.IsActive.Value;
+                user.Activate();
+            else
+                user.Deactivate();
 
-            await _userRepository.SaveChangesAsync();
+                await _userRepository.SaveChangesAsync();
 
             return user.ToResponseDto();
         }
@@ -164,6 +166,24 @@ namespace Base.Application.Services
 
             return _jwtService.GenerateToken(user);
         }
+
+        public async Task UnlockUserAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null) throw new InvalidOperationException("User not found");
+
+            user.Unlock();
+            await _userRepository.SaveChangesAsync();
+        }
+
+        public async Task RemoveRoleAsync(Guid userId, string roleName)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            var role = user.Roles.FirstOrDefault(r => r.Name == roleName);
+            if (role != null) user.Roles.Remove(role);
+            await _userRepository.SaveChangesAsync();
+        }
+
 
 
     }

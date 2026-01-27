@@ -71,7 +71,11 @@ namespace Base.Domain.Entities
             PasswordSalt = newSalt;
             PasswordChangedAt = DateTime.UtcNow;
         }
-
+        public void Activate()
+        {
+            IsActive = true;
+            MarkUpdated();
+        }
         public void Deactivate()
         {
             IsActive = false;
@@ -93,6 +97,14 @@ namespace Base.Domain.Entities
             if (IsDeleted) return;
             MarkDeleted();
         }
+
+        public void Unlock()
+        {
+            IsLocked = false;
+            FailedLoginAttempts = 0;
+            MarkUpdated();
+        }
+
 
 
     }
